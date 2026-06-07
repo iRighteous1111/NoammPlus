@@ -1,7 +1,7 @@
 package com.github.noamm9.untitled.mixins;
 
 import com.github.noamm9.NoammAddons;
-import com.github.noamm9.ui.clickgui.CategoryType;
+import com.github.noamm9.ui.clickgui.enums.CategoryType;
 import kotlin.enums.EnumEntriesKt;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -58,7 +58,6 @@ public class MixinCategoryType {
             long offset = unsafe.staticFieldOffset(entriesField);
             var newEntries = EnumEntriesKt.enumEntries(newValuesArray);
             unsafe.putObject(base, offset, newEntries);
-
         } catch (Exception e) {
             NoammAddons.logger.error("Error while adding custom category type", e);
             e.printStackTrace();
