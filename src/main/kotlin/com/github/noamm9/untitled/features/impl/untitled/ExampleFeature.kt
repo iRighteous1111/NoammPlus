@@ -7,7 +7,7 @@ import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import com.github.noamm9.utils.render.Render2D.height
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
 /**
@@ -44,7 +44,7 @@ object ExampleFeature : Feature(
     private val sprintHud = hudElement(
         name = "Sprint Status",
         centered = true
-    ) { context: GuiGraphics, isExample: Boolean ->
+    ) { context: GuiGraphicsExtractor, isExample: Boolean ->
         val text = if (isExample) "[Sprinting]"
         else if (mc.player?.isSprinting == true) "[Sprinting]" else "[Walking]"
 

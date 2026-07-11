@@ -1,17 +1,14 @@
 import org.gradle.kotlin.dsl.annotationProcessor
 import org.gradle.kotlin.dsl.implementation
 import org.gradle.kotlin.dsl.include
-import org.gradle.kotlin.dsl.mappings
-import org.gradle.kotlin.dsl.modImplementation
-import org.gradle.kotlin.dsl.modRuntimeOnly
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.3.10"
-    id("fabric-loom") version "1.15-SNAPSHOT"
+    kotlin("jvm") version "2.3.21"
+    id("net.fabricmc.fabric-loom") version "1.16.2"
     id("maven-publish")
-    id ("org.jetbrains.kotlin.plugin.serialization") version "2.3.10"
+    id ("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"
 }
 
 version = project.property("mod_version") as String
@@ -21,7 +18,7 @@ base {
     archivesName.set(project.property("archives_base_name") as String)
 }
 
-val targetJavaVersion = 21
+val targetJavaVersion = 25
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     withSourcesJar()
@@ -36,18 +33,17 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
-    mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
+    implementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
+    implementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
 
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
+    runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     include("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
-    modImplementation("com.github.Noamm9:NoammAddons:${project.property("noammaddons_version")}:${project.property("noammaddons_type")}")
+    implementation("com.github.Noamm9:NoammAddons:${project.property("noammaddons_version")}:${project.property("noammaddons_type")}")
 }
 
 tasks.processResources {
