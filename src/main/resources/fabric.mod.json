@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "untitled",
+  "id": "noammplus",
   "version": "${version}",
-  "name": "untitled",
+  "name": "NoammPlus",
   "description": "",
   "authors": [],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/untitled/icon.png",
+  "icon": "assets/noammplus/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
       {
-        "value": "com.github.noamm9.untitled.Untitled",
+        "value": "com.github.noamm9.noammplus.NoammPlus",
         "adapter": "kotlin"
       }
     ]
   },
   "mixins": [
-    "untitled.mixins.json"
+    "noammplus.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
