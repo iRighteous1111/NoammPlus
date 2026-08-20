@@ -17,46 +17,54 @@ import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 
 object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be larger.", "Secret Hitboxes Plus") {
-    val lever by ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
+    val lever = ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val leverWidth by SliderSetting("Lever Width", 1.0f, 0.0f, 1.0f, 0.05f)
+    val leverWidth = SliderSetting("Lever Width", 1.0f, 0.0f, 1.0f, 0.05f)
         .showIf { lever.value }
         .withDescription("Lever hitbox width (X axis). 0.0 means vanilla size.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val leverHeight by SliderSetting("Lever Height", 1.0f, 0.0f, 1.0f, 0.05f)
+    val leverHeight = SliderSetting("Lever Height", 1.0f, 0.0f, 1.0f, 0.05f)
         .showIf { lever.value }
         .withDescription("Lever hitbox height (Y axis). 0.0 means vanilla size.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val leverLength by SliderSetting("Lever Length", 1.0f, 0.0f, 1.0f, 0.05f)
+    val leverLength = SliderSetting("Lever Length", 1.0f, 0.0f, 1.0f, 0.05f)
         .showIf { lever.value }
         .withDescription("Lever hitbox length (Z axis). 0.0 means vanilla size.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val button by ToggleSetting("Button").withDescription("Full block button hitbox.")
+    val button = ToggleSetting("Button").withDescription("Full block button hitbox.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val buttonSize by SliderSetting("Button Size", 1.0f, 0.0f, 1.0f, 0.05f)
+    val buttonSize = SliderSetting("Button Size", 1.0f, 0.0f, 1.0f, 0.05f)
         .showIf { button.value }
         .withDescription("Button hitbox size ratio. 0.0 means vanilla size.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val skull by ToggleSetting("Skulls").withDescription("Full block Skull hitbox.")
+    val skull = ToggleSetting("Skulls").withDescription("Full block Skull hitbox.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     @JvmStatic
-    val mushroom by ToggleSetting("Mushroom").withDescription("Full block Mushroom hitbox.")
+    val mushroom = ToggleSetting("Mushroom").withDescription("Full block Mushroom hitbox.")
         .onChange { mc.levelRenderer?.allChanged() }
 
     override fun init() {
+        configSettings.add(lever)
+        configSettings.add(leverWidth)
+        configSettings.add(leverHeight)
+        configSettings.add(leverLength)
+        configSettings.add(button)
+        configSettings.add(buttonSize)
+        configSettings.add(skull)
+        configSettings.add(mushroom)
         ClientLifecycleEvents.CLIENT_STARTED.register { disableBlockstateCulling() }
     }
 

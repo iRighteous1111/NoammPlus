@@ -20,7 +20,7 @@ public class MixinLeverBlock {
             float w = SecretHitboxesPlus.getLeverWidth().getValue();
             float h = SecretHitboxesPlus.getLeverHeight().getValue();
             float l = SecretHitboxesPlus.getLeverLength().getValue();
-            if (w > 0.0f && h > 0.0f && l > 0.0f) {
+            if (w > 0.0f || h > 0.0f || l > 0.0f) {
                 cir.setReturnValue(SecretHitboxesPlus.getLeverShape(state, w, h, l));
             }
         }
