@@ -5,6 +5,7 @@ import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
 import com.github.noamm9.utils.location.LocationUtils
+import com.github.noamm9.noammplus.NoammPlus
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.BlockPos
@@ -70,12 +71,14 @@ object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be
 
     override fun onEnable() {
         super.onEnable()
+        NoammPlus.secretHitboxesEnabled = true
         disableBlockstateCulling()
         mc.levelRenderer?.allChanged()
     }
 
     override fun onDisable() {
         super.onDisable()
+        NoammPlus.secretHitboxesEnabled = false
         mc.levelRenderer?.allChanged()
     }
 

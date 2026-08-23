@@ -1,5 +1,6 @@
 package com.github.noamm9.noammplus.mixins;
 
+import com.github.noamm9.noammplus.NoammPlus;
 import com.github.noamm9.noammplus.features.impl.plus.SecretHitboxesPlus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinButtonBlock {
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void modifyShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.getButton().getValue()) {
+        if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.getButton().getValue()) {
             float size = SecretHitboxesPlus.getButtonSize().getValue();
             if (size > 0.0f) {
                 cir.setReturnValue(SecretHitboxesPlus.getButtonShape(state, size));

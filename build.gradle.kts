@@ -24,9 +24,9 @@ java {
     withSourcesJar()
 }
 
-
-
 repositories {
+    mavenCentral()
+    maven { url = uri("https://maven.fabricmc.net/") }
     maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
     maven { url = uri("https://jitpack.io") }
 }

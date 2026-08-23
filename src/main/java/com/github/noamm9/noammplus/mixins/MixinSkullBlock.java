@@ -1,5 +1,6 @@
 package com.github.noamm9.noammplus.mixins;
 
+import com.github.noamm9.noammplus.NoammPlus;
 import com.github.noamm9.noammplus.features.impl.plus.SecretHitboxesPlus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
@@ -14,7 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public class MixinSkullBlock {
     @org.spongepowered.asm.mixin.Overwrite
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.getSkull().getValue()) {
+        if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.getSkull().getValue()) {
             return Shapes.block();
         }
         return Shapes.empty();
