@@ -24,21 +24,24 @@ object SecretHitboxesSettings {
         Class.forName("com.github.noamm9.ui.clickgui.components.impl.SliderSetting")
     }
 
-    // Instantiation helpers
+    // Instantiation helpers using robust constructor scanning
     private fun createToggle(name: String, defaultValue: Boolean): Any {
-        val constructor = toggleSettingClass.getConstructor(String::class.java, Boolean::class.java)
+        val constructor = toggleSettingClass.constructors.find {
+            it.parameterTypes.size == 2 &&
+            it.parameterTypes[0] == String::class.java &&
+            (it.parameterTypes[1] == Boolean::class.javaPrimitiveType || it.parameterTypes[1] == Boolean::class.java)
+        } ?: throw NoSuchMethodException("Could not find ToggleSetting constructor with 2 parameters")
         return constructor.newInstance(name, defaultValue)
     }
 
     private fun createSlider(name: String, defaultValue: Float, min: Float, max: Float, step: Float): Any {
-        val constructor = sliderSettingClass.getConstructor(
-            String::class.java,
-            Float::class.java,
-            Float::class.java,
-            Float::class.java,
-            Float::class.java
-        )
-        return constructor.newInstance(name, defaultValue, min, max, step)
+        // T: Number erases to java.lang.Number. The constructor has 6 parameters: (String, Number, Number, Number, Number, String)
+        val constructor = sliderSettingClass.constructors.find {
+            it.parameterTypes.size == 6 &&
+            it.parameterTypes[0] == String::class.java &&
+            Number::class.java.isAssignableFrom(it.parameterTypes[1])
+        } ?: throw NoSuchMethodException("Could not find SliderSetting constructor with 6 parameters")
+        return constructor.newInstance(name, defaultValue, min, max, step, "")
     }
 
     // Value helper
