@@ -18,9 +18,9 @@ import net.minecraft.world.phys.shapes.VoxelShape
 object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be larger.", "Secret Hitboxes Plus") {
 
     val isClickGuiPresent = try {
-        Class.forName("com.github.noamm9.ui.clickgui.components.impl.ToggleSetting")
+        Class.forName("com.github.noamm9.ui.clickgui.components.impl.ToggleSetting", false, SecretHitboxesPlus::class.java.classLoader)
         true
-    } catch (e: ClassNotFoundException) {
+    } catch (e: Throwable) {
         false
     }
 
@@ -73,6 +73,7 @@ object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be
     }
 
     override fun init() {
+        com.github.noamm9.NoammAddons.logger.info("NoammPlus: isClickGuiPresent = $isClickGuiPresent")
         if (isClickGuiPresent) {
             SecretHitboxesSettings.register(this)
         }
