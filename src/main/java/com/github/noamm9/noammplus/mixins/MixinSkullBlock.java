@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public class MixinSkullBlock {
     @org.spongepowered.asm.mixin.Overwrite
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.getSkull().getValue()) {
+        if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.isSkullEnabled()) {
             return Shapes.block();
         }
         return Shapes.empty();

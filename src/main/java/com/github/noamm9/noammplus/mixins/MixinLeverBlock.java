@@ -18,9 +18,9 @@ public class MixinLeverBlock {
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void modifyShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.isValidLever(pos)) {
-            float w = SecretHitboxesPlus.getLeverWidth().getValue();
-            float h = SecretHitboxesPlus.getLeverHeight().getValue();
-            float l = SecretHitboxesPlus.getLeverLength().getValue();
+            float w = SecretHitboxesPlus.getLeverWidthValue();
+            float h = SecretHitboxesPlus.getLeverHeightValue();
+            float l = SecretHitboxesPlus.getLeverLengthValue();
             if (w > 0.0f || h > 0.0f || l > 0.0f) {
                 cir.setReturnValue(SecretHitboxesPlus.getLeverShape(state, w, h, l));
             }

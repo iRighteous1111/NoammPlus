@@ -2,8 +2,6 @@
 package com.github.noamm9.noammplus.features.impl.plus
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.noammplus.NoammPlus
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
@@ -18,54 +16,66 @@ import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 
 object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be larger.", "Secret Hitboxes Plus") {
-    val lever = ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+
+    val isClickGuiPresent = try {
+        Class.forName("com.github.noamm9.ui.clickgui.components.impl.ToggleSetting")
+        true
+    } catch (e: ClassNotFoundException) {
+        false
+    }
 
     @JvmStatic
-    val leverWidth = SliderSetting("Lever Width", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { lever.value }
-        .withDescription("Lever hitbox width (X axis). 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun isButtonEnabled(): Boolean {
+        if (!isClickGuiPresent) return false
+        return SecretHitboxesSettings.button.value
+    }
 
     @JvmStatic
-    val leverHeight = SliderSetting("Lever Height", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { lever.value }
-        .withDescription("Lever hitbox height (Y axis). 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun getButtonSizeValue(): Float {
+        if (!isClickGuiPresent) return 0.0f
+        return SecretHitboxesSettings.buttonSize.value
+    }
 
     @JvmStatic
-    val leverLength = SliderSetting("Lever Length", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { lever.value }
-        .withDescription("Lever hitbox length (Z axis). 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun isLeverEnabled(): Boolean {
+        if (!isClickGuiPresent) return false
+        return SecretHitboxesSettings.lever.value
+    }
 
     @JvmStatic
-    val button = ToggleSetting("Button").withDescription("Full block button hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun getLeverWidthValue(): Float {
+        if (!isClickGuiPresent) return 0.0f
+        return SecretHitboxesSettings.leverWidth.value
+    }
 
     @JvmStatic
-    val buttonSize = SliderSetting("Button Size", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { button.value }
-        .withDescription("Button hitbox size ratio. 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun getLeverHeightValue(): Float {
+        if (!isClickGuiPresent) return 0.0f
+        return SecretHitboxesSettings.leverHeight.value
+    }
 
     @JvmStatic
-    val skull = ToggleSetting("Skulls").withDescription("Full block Skull hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun getLeverLengthValue(): Float {
+        if (!isClickGuiPresent) return 0.0f
+        return SecretHitboxesSettings.leverLength.value
+    }
 
     @JvmStatic
-    val mushroom = ToggleSetting("Mushroom").withDescription("Full block Mushroom hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    fun isSkullEnabled(): Boolean {
+        if (!isClickGuiPresent) return false
+        return SecretHitboxesSettings.skull.value
+    }
+
+    @JvmStatic
+    fun isMushroomEnabled(): Boolean {
+        if (!isClickGuiPresent) return false
+        return SecretHitboxesSettings.mushroom.value
+    }
 
     override fun init() {
-        configSettings.add(lever)
-        configSettings.add(leverWidth)
-        configSettings.add(leverHeight)
-        configSettings.add(leverLength)
-        configSettings.add(button)
-        configSettings.add(buttonSize)
-        configSettings.add(skull)
-        configSettings.add(mushroom)
+        if (isClickGuiPresent) {
+            SecretHitboxesSettings.register(this)
+        }
         ClientLifecycleEvents.CLIENT_STARTED.register { disableBlockstateCulling() }
     }
 
@@ -173,7 +183,7 @@ object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be
     @JvmStatic
     fun isValidLever(pos: BlockPos): Boolean {
         if (! enabled) return false
-        if (! lever.value) return false
+        if (! isLeverEnabled()) return false
         if (pos in blackListedLevers && LocationUtils.dungeonFloorNumber == 7) return false
         return true
     }

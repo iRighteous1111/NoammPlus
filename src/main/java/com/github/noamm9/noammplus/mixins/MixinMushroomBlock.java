@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinMushroomBlock {
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void modifyShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.getMushroom().getValue()) {
+        if (NoammPlus.secretHitboxesEnabled && SecretHitboxesPlus.INSTANCE.enabled && SecretHitboxesPlus.isMushroomEnabled()) {
             cir.setReturnValue(Shapes.block());
         }
     }
