@@ -18,58 +18,63 @@ import net.minecraft.world.phys.shapes.VoxelShape
 object SecretHitboxesPlus : Feature("Changes the hitboxes of secret blocks to be larger.", "Secret Hitboxes Plus") {
 
     val isClickGuiPresent = try {
-        Class.forName("com.github.noamm9.ui.clickgui.components.impl.ToggleSetting", false, SecretHitboxesPlus::class.java.classLoader)
+        Class.forName("com.github.noamm9.config.types.ToggleSetting", false, SecretHitboxesPlus::class.java.classLoader)
         true
     } catch (e: Throwable) {
-        false
+        try {
+            Class.forName("com.github.noamm9.ui.clickgui.components.impl.ToggleSetting", false, SecretHitboxesPlus::class.java.classLoader)
+            true
+        } catch (e2: Throwable) {
+            false
+        }
     }
 
     @JvmStatic
     fun isButtonEnabled(): Boolean {
         if (!isClickGuiPresent) return false
-        return SecretHitboxesSettings.button.value
+        return SecretHitboxesSettings.buttonValue
     }
 
     @JvmStatic
     fun getButtonSizeValue(): Float {
         if (!isClickGuiPresent) return 0.0f
-        return SecretHitboxesSettings.buttonSize.value
+        return SecretHitboxesSettings.buttonSizeValue
     }
 
     @JvmStatic
     fun isLeverEnabled(): Boolean {
         if (!isClickGuiPresent) return false
-        return SecretHitboxesSettings.lever.value
+        return SecretHitboxesSettings.leverValue
     }
 
     @JvmStatic
     fun getLeverWidthValue(): Float {
         if (!isClickGuiPresent) return 0.0f
-        return SecretHitboxesSettings.leverWidth.value
+        return SecretHitboxesSettings.leverWidthValue
     }
 
     @JvmStatic
     fun getLeverHeightValue(): Float {
         if (!isClickGuiPresent) return 0.0f
-        return SecretHitboxesSettings.leverHeight.value
+        return SecretHitboxesSettings.leverHeightValue
     }
 
     @JvmStatic
     fun getLeverLengthValue(): Float {
         if (!isClickGuiPresent) return 0.0f
-        return SecretHitboxesSettings.leverLength.value
+        return SecretHitboxesSettings.leverLengthValue
     }
 
     @JvmStatic
     fun isSkullEnabled(): Boolean {
         if (!isClickGuiPresent) return false
-        return SecretHitboxesSettings.skull.value
+        return SecretHitboxesSettings.skullValue
     }
 
     @JvmStatic
     fun isMushroomEnabled(): Boolean {
         if (!isClickGuiPresent) return false
-        return SecretHitboxesSettings.mushroom.value
+        return SecretHitboxesSettings.mushroomValue
     }
 
     override fun init() {

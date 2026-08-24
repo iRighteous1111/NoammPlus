@@ -1,54 +1,182 @@
 package com.github.noamm9.noammplus.features.impl.plus
 
-import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.components.Setting.Companion.withDescription
-import com.github.noamm9.ui.clickgui.components.Setting.Companion.showIf
-import com.github.noamm9.ui.clickgui.components.Setting.Companion.onChange
 import com.github.noamm9.features.Feature
 import com.github.noamm9.NoammAddons.mc
 
 object SecretHitboxesSettings {
-    val lever = ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
 
-    val leverWidth = SliderSetting("Lever Width", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { lever.value }
-        .withDescription("Lever hitbox width (X axis). 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    val isNewVersion = try {
+        Class.forName("com.github.noamm9.config.types.ToggleSetting", false, SecretHitboxesSettings::class.java.classLoader)
+        true
+    } catch (e: Throwable) {
+        false
+    }
 
-    val leverHeight = SliderSetting("Lever Height", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { lever.value }
-        .withDescription("Lever hitbox height (Y axis). 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    private val toggleSettingClass = if (isNewVersion) {
+        Class.forName("com.github.noamm9.config.types.ToggleSetting")
+    } else {
+        Class.forName("com.github.noamm9.ui.clickgui.components.impl.ToggleSetting")
+    }
 
-    val leverLength = SliderSetting("Lever Length", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { lever.value }
-        .withDescription("Lever hitbox length (Z axis). 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    private val sliderSettingClass = if (isNewVersion) {
+        Class.forName("com.github.noamm9.config.types.SliderSetting")
+    } else {
+        Class.forName("com.github.noamm9.ui.clickgui.components.impl.SliderSetting")
+    }
 
-    val button = ToggleSetting("Button").withDescription("Full block button hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    // Instantiation helpers
+    private fun createToggle(name: String, defaultValue: Boolean): Any {
+        val constructor = toggleSettingClass.getConstructor(String::class.java, Boolean::class.java)
+        return constructor.newInstance(name, defaultValue)
+    }
 
-    val buttonSize = SliderSetting("Button Size", 1.0f, 0.0f, 1.0f, 0.05f)
-        .showIf { button.value }
-        .withDescription("Button hitbox size ratio. 0.0 means vanilla size.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    private fun createSlider(name: String, defaultValue: Float, min: Float, max: Float, step: Float): Any {
+        val constructor = sliderSettingClass.getConstructor(
+            String::class.java,
+            Float::class.java,
+            Float::class.java,
+            Float::class.java,
+            Float::class.java
+        )
+        return constructor.newInstance(name, defaultValue, min, max, step)
+    }
 
-    val skull = ToggleSetting("Skulls").withDescription("Full block Skull hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    // Value helper
+    private fun getValue(setting: Any): Any {
+        val method = setting.javaClass.getMethod("getValue")
+        return method.invoke(setting)
+    }
 
-    val mushroom = ToggleSetting("Mushroom").withDescription("Full block Mushroom hitbox.")
-        .onChange { mc.levelRenderer?.allChanged() }
+    // Builder helpers
+    private fun withDescription(setting: Any, desc: String, feature: Feature): Any {
+        if (isNewVersion) {
+            val providerClass = Class.forName("com.github.noamm9.config.SettingProvider")
+            val defaultImplsClass = Class.forName("com.github.noamm9.config.SettingProvider\$DefaultImpls")
+            val configHolderClass = Class.forName("com.github.noamm9.config.ConfigHolder")
+            val method = defaultImplsClass.getMethod("withDescription", providerClass, configHolderClass, String::class.java)
+            return method.invoke(null, feature, setting, desc)
+        } else {
+            val companionClass = Class.forName("com.github.noamm9.ui.clickgui.components.Setting\$Companion")
+            val settingClass = Class.forName("com.github.noamm9.ui.clickgui.components.Setting")
+            val companionInstance = Class.forName("com.github.noamm9.ui.clickgui.components.Setting").getField("Companion").get(null)
+            val method = companionClass.getMethod("withDescription", settingClass, String::class.java)
+            return method.invoke(companionInstance, setting, desc)
+        }
+    }
 
+    private fun showIf(setting: Any, condition: () -> Boolean, feature: Feature): Any {
+        val functionClass = Class.forName("kotlin.jvm.functions.Function0")
+        if (isNewVersion) {
+            val providerClass = Class.forName("com.github.noamm9.config.SettingProvider")
+            val defaultImplsClass = Class.forName("com.github.noamm9.config.SettingProvider\$DefaultImpls")
+            val configHolderClass = Class.forName("com.github.noamm9.config.ConfigHolder")
+            val method = defaultImplsClass.getMethod("showIf", providerClass, configHolderClass, functionClass)
+            return method.invoke(null, feature, setting, condition)
+        } else {
+            val companionClass = Class.forName("com.github.noamm9.ui.clickgui.components.Setting\$Companion")
+            val settingClass = Class.forName("com.github.noamm9.ui.clickgui.components.Setting")
+            val companionInstance = Class.forName("com.github.noamm9.ui.clickgui.components.Setting").getField("Companion").get(null)
+            val method = companionClass.getMethod("showIf", settingClass, functionClass)
+            return method.invoke(companionInstance, setting, condition)
+        }
+    }
+
+    private fun onChange(setting: Any, listener: () -> Unit, feature: Feature): Any {
+        val functionClass = Class.forName("kotlin.jvm.functions.Function1")
+        val listenerWrapper = object : kotlin.jvm.functions.Function1<Any?, Unit> {
+            override fun invoke(p1: Any?) {
+                listener()
+            }
+        }
+        if (isNewVersion) {
+            val providerClass = Class.forName("com.github.noamm9.config.SettingProvider")
+            val defaultImplsClass = Class.forName("com.github.noamm9.config.SettingProvider\$DefaultImpls")
+            val configHolderClass = Class.forName("com.github.noamm9.config.ConfigHolder")
+            val method = defaultImplsClass.getMethod("onChange", providerClass, configHolderClass, functionClass)
+            return method.invoke(null, feature, setting, listenerWrapper)
+        } else {
+            val companionClass = Class.forName("com.github.noamm9.ui.clickgui.components.Setting\$Companion")
+            val settingClass = Class.forName("com.github.noamm9.ui.clickgui.components.Setting")
+            val companionInstance = Class.forName("com.github.noamm9.ui.clickgui.components.Setting").getField("Companion").get(null)
+            val method = companionClass.getMethod("onChange", settingClass, functionClass)
+            return method.invoke(companionInstance, setting, listenerWrapper)
+        }
+    }
+
+    // Actual settings instances (instantiated in initSettings)
+    lateinit var lever: Any
+    lateinit var leverWidth: Any
+    lateinit var leverHeight: Any
+    lateinit var leverLength: Any
+    lateinit var button: Any
+    lateinit var buttonSize: Any
+    lateinit var skull: Any
+    lateinit var mushroom: Any
+
+    fun initSettings(feature: Feature) {
+        lever = createToggle("Lever", false)
+        withDescription(lever, "Full block Lever hitbox.", feature)
+        onChange(lever, { mc.levelRenderer?.allChanged() }, feature)
+
+        leverWidth = createSlider("Lever Width", 1.0f, 0.0f, 1.0f, 0.05f)
+        showIf(leverWidth, { getValue(lever) as Boolean }, feature)
+        withDescription(leverWidth, "Lever hitbox width (X axis). 0.0 means vanilla size.", feature)
+        onChange(leverWidth, { mc.levelRenderer?.allChanged() }, feature)
+
+        leverHeight = createSlider("Lever Height", 1.0f, 0.0f, 1.0f, 0.05f)
+        showIf(leverHeight, { getValue(lever) as Boolean }, feature)
+        withDescription(leverHeight, "Lever hitbox height (Y axis). 0.0 means vanilla size.", feature)
+        onChange(leverHeight, { mc.levelRenderer?.allChanged() }, feature)
+
+        leverLength = createSlider("Lever Length", 1.0f, 0.0f, 1.0f, 0.05f)
+        showIf(leverLength, { getValue(lever) as Boolean }, feature)
+        withDescription(leverLength, "Lever hitbox length (Z axis). 0.0 means vanilla size.", feature)
+        onChange(leverLength, { mc.levelRenderer?.allChanged() }, feature)
+
+        button = createToggle("Button", false)
+        withDescription(button, "Full block button hitbox.", feature)
+        onChange(button, { mc.levelRenderer?.allChanged() }, feature)
+
+        buttonSize = createSlider("Button Size", 1.0f, 0.0f, 1.0f, 0.05f)
+        showIf(buttonSize, { getValue(button) as Boolean }, feature)
+        withDescription(buttonSize, "Button hitbox size ratio. 0.0 means vanilla size.", feature)
+        onChange(buttonSize, { mc.levelRenderer?.allChanged() }, feature)
+
+        skull = createToggle("Skulls", false)
+        withDescription(skull, "Full block Skull hitbox.", feature)
+        onChange(skull, { mc.levelRenderer?.allChanged() }, feature)
+
+        mushroom = createToggle("Mushroom", false)
+        withDescription(mushroom, "Full block Mushroom hitbox.", feature)
+        onChange(mushroom, { mc.levelRenderer?.allChanged() }, feature)
+    }
+
+    val leverValue: Boolean get() = getValue(lever) as Boolean
+    val leverWidthValue: Float get() = getValue(leverWidth) as Float
+    val leverHeightValue: Float get() = getValue(leverHeight) as Float
+    val leverLengthValue: Float get() = getValue(leverLength) as Float
+    val buttonValue: Boolean get() = getValue(button) as Boolean
+    val buttonSizeValue: Float get() = getValue(buttonSize) as Float
+    val skullValue: Boolean get() = getValue(skull) as Boolean
+    val mushroomValue: Boolean get() = getValue(mushroom) as Boolean
+
+    @Suppress("UNCHECKED_CAST")
     fun register(feature: Feature) {
-        feature.configSettings.add(lever)
-        feature.configSettings.add(leverWidth)
-        feature.configSettings.add(leverHeight)
-        feature.configSettings.add(leverLength)
-        feature.configSettings.add(button)
-        feature.configSettings.add(buttonSize)
-        feature.configSettings.add(skull)
-        feature.configSettings.add(mushroom)
+        initSettings(feature)
+        val configSettingsSet = try {
+            val getter = feature.javaClass.getMethod("getConfigSettings")
+            getter.invoke(feature) as MutableSet<Any>
+        } catch (e: Exception) {
+            val field = feature.javaClass.getField("configSettings")
+            field.get(feature) as MutableSet<Any>
+        }
+        configSettingsSet.add(lever)
+        configSettingsSet.add(leverWidth)
+        configSettingsSet.add(leverHeight)
+        configSettingsSet.add(leverLength)
+        configSettingsSet.add(button)
+        configSettingsSet.add(buttonSize)
+        configSettingsSet.add(skull)
+        configSettingsSet.add(mushroom)
     }
 }
